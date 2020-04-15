@@ -10,7 +10,7 @@ class Song:
 
     def get_song(self):
         with open(self.path, 'r') as f:
-            return "\n".join(list(f))
+            return "\n".join(f.readlines())
 
 
 class Music:
@@ -34,6 +34,7 @@ class Music:
         return song
 
     def play(self, name):
+        # print(f"Looking for song {name}")
         for song in self.songs:
             if name.lower() in song.name.lower():
                 return song.get_song()

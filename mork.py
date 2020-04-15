@@ -126,6 +126,35 @@ class Mork(commands.Cog):
             print("something")
 
     @commands.command()
+    async def say(self, ctx, *, text: str):
+        """ synthesize the given text in your voice channel """
+        await self.join(ctx.author)
+        await self.invoke(text)
+
+    @commands.command()
+    async def quiet(self, ctx):
+        """ immediately stop playing any actively synthesized text """
+        # If the bot is not in the user's channel, silently NOP.
+        if not self.is_joined(ctx.author):
+            return
+        if not self.voice.is_playing():
+            raise BadVoice('Bot is not active.')
+
+        self.voice.stop()
+
+    @commands.command()
+    async def bye(self, ctx):
+        """ disconnect the bot from your voice channel """
+        # If the bot is not in the user's channel, silently NOP.
+        if not self.is_joined(ctx.author):
+            return
+        if self.voice.is_playing():
+            raise BadVoice('Bot cannot leave while speaking.')
+
+        await self.voice.disconnect()
+        self.voice = None
+
+    @commands.command()
     async def F(self, ctx):
         """F"""
         if ctx.author.voice:
@@ -135,7 +164,7 @@ class Mork(commands.Cog):
 [pr<600,23>][pr<300,27>][pr<1800,30>][pr<900,27>][pr<900,23>][pr<1800,18>]
 [pr<600,18>][pr<200,18>][pr<1800,23>]""")
 
-    @commands.group()
+    @commands.group(aliases=["sing"])
     async def play(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid command passed...')
@@ -150,15 +179,15 @@ class Mork(commands.Cog):
 
     @play.command()
     async def song(self, ctx, *, song):
-        """Plays a song. Song list at """
-        print(f"Playing: {song}")
+        """Plays a song"""
         await self.join(ctx.author)
-        await self.invoke(self.music.play(song))
+        song_data = self.music.play(song)
+        await self.invoke(song_data)
 
-    @play.command()
-    async def stop(self, ctx):
-        """Stops playing"""
-        self.voice.stop()
+    # @play.command()
+    # async def stop(self, ctx):
+    #     """Stops playing"""
+    #     self.voice.stop()
 
     @play.command()
     async def list(self, ctx):
@@ -170,8 +199,8 @@ class Mork(commands.Cog):
 with open("token.txt", 'r') as f:
     token = f.readlines()[0]
 
-client = commands.Bot(command_prefix="mork ")
-client.add_cog(decbot.bot.Voice(client))
+client = commands.Bot(command_prefix="mork ", case_insensitive=True)
+# client.add_cog(decbot.bot.Voice(client))
 client.add_cog(decbot.bot.Text(client))
 client.add_cog(decbot.bot.Util(client))
 client.add_cog(Mork(client))
