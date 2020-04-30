@@ -165,6 +165,19 @@ class Mork(commands.Cog):
 [pr<600,18>][pr<200,18>][pr<1800,23>]""")
 
     @commands.group(aliases=["sing"])
+    @commands.command()
+    async def oopsie(self, ctx):
+        """Oopsie woopsie pt1"""
+        if ctx.author.voice:
+            await self.join(ctx.author)
+            await self.invoke("""[d<1,50>]OOPSIE WOOPSIE!!  [d<1,100>]Uwu We make a fucky wucky!!  [d<1,150>]A wittle fucko boingo!  [d<1,200>]The code monkeys at our headquarters are working VEWY HAWD to fix this!""")
+
+    @commands.command()
+    async def woopsie(self, ctx):
+        """Oopsie woopsie pt2"""
+        oopsie(self, ctx)
+
+    @commands.group()
     async def play(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid command passed...')
